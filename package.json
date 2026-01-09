@@ -1,5 +1,5 @@
 {
-  "name": "quixe-sachin",
+  "name": "quizipy",
   "version": "1.0.0",
   "type": "module",
   "main": "server.js",
@@ -42,6 +42,7 @@
     "gopd": "^1.2.0",
     "has-symbols": "^1.1.0",
     "hasown": "^2.0.2",
+    "helmet": "^8.1.0",
     "http-errors": "^2.0.0",
     "iconv-lite": "^0.4.24",
     "inherits": "^2.0.4",
@@ -70,6 +71,7 @@
     "object-inspect": "^1.13.4",
     "on-finished": "^2.4.1",
     "parseurl": "^1.3.3",
+    "path": "^0.12.7",
     "path-to-regexp": "^0.1.12",
     "proxy-addr": "^2.0.7",
     "punycode": "^2.3.1",
@@ -99,6 +101,7 @@
     "type-is": "^1.6.18",
     "undici-types": "^6.20.0",
     "unpipe": "^1.0.0",
+    "url": "^0.11.4",
     "utils-merge": "^1.0.1",
     "vary": "^1.1.2",
     "webidl-conversions": "^7.0.0",
@@ -112,5 +115,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
