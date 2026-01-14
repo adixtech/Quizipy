@@ -6,53 +6,55 @@ import { nanoid } from 'nanoid';
 // Create a quiz abho dala hu 29 oct
 // import { nanoid } from "nanoid"; // ✅ Correct import (curly braces)
 
+import Quiz from '../models/Quiz.js';
+
+// ✅ CREATE QUIZ (FINAL FIXED VERSION)
 export const createQuiz = async (req, res) => {
   try {
     const { title, description, timer, questions } = req.body;
 
-    // ✅ Generate a unique quiz code using nanoid
-    let quizCode = nanoid(6).toUpperCase();
-
-    // ✅ Ensure code is unique
-    while (await Quiz.findOne({ $or: [{ code: quizCode }, { quizCode }] })) {
-      quizCode = nanoid(6).toUpperCase();
+    // 🔐 Basic validation
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+      return res.status(400).json({ message: "At least one question is required" });
     }
 
-    // ✅ Create quiz document
+    // ✅ Let MODEL generate quizCode automatically
     const quiz = new Quiz({
       title: title || "Untitled Quiz",
       description: description || "",
-      timer: timer || 0,
-      questions: Array.isArray(questions) ? questions : [],
-      code: quizCode,        // ✅ Required for unique index
-      quizCode: quizCode,    // ✅ For consistent lookup
-      createdBy: req.user?._id || null,
-      questionCount: questions.length // ✅ add this line
+      timer: Number(timer) || 0,
+      questions,
+      createdBy: req.user.id   // ✅ correct JWT usage
     });
 
     await quiz.save();
 
-    console.log("✅ Quiz created successfully with code:", quizCode);
+    console.log("✅ Quiz created with code:", quiz.quizCode);
 
+    // ✅ IMPORTANT: Return quizCode to frontend
     res.status(201).json({
       message: "Quiz created successfully",
-      quizCode,
-      id: quiz._id,
+      quizCode: quiz.quizCode,
+      quizId: quiz._id
     });
+
   } catch (err) {
     console.error("❌ Error creating quiz:", err);
+
+    // Duplicate quizCode safety (very rare)
     if (err.code === 11000) {
       return res.status(400).json({
-        error: "Duplicate quiz code. Please retry.",
-        details: err.message,
+        message: "Duplicate quiz code generated, please retry"
       });
     }
+
     res.status(500).json({
-      error: "Failed to create quiz",
-      details: err.message,
+      message: "Failed to create quiz",
+      error: err.message
     });
   }
 };
+
 
 
 // ✅ Fetch quiz by code (case-insensitive search)
