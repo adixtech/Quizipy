@@ -158,9 +158,10 @@ export const getQuizzes = async (req, res) => {
   try {
     const quizzes = await Quiz.find({ createdBy: req.user.id })
       .select("title description quizCode questions createdAt")
+      .sort({ createdAt: -1 }) // Sort by newest first
       .lean();
 
-    // include questionCount for dashboard
+    // Map to include questionCount for dashboard
     const withCounts = quizzes.map(q => ({
       ...q,
       questionCount: q.questions ? q.questions.length : 0

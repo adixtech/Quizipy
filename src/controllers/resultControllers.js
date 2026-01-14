@@ -3,18 +3,19 @@ import Result from '../models/result.js';
 // ✅ Fetch all quiz results (sorted by highest score)
 export const getResults = async (req, res) => {
   try {
-    console.log("🔍 Fetching quiz results...");
+    const quizzes = await Quiz.find({ createdBy: req.user.id })
+      .select("quizCode")
+      .lean();
 
-    const results = await Result.find().sort({ score: -1 });
+    const quizCodes = quizzes.map(q => q.quizCode);
 
-    if (!results || results.length === 0) {
-      console.log("⚠ No quiz results found.");
-      // return empty array instead of 404 so clients can render gracefully
-      return res.status(200).json([]);
-    }
+    const results = await Result.find({
+      quizCode: { $in: quizCodes }
+    })
+    .sort({ createdAt: -1 })
+    .lean();
 
-    console.log("✅ Results Fetched:", results.length);
-    res.status(200).json(results);
+    res.status(200).json(results || []);
   } catch (error) {
     console.error("❌ Error fetching results:", error);
     res.status(500).json({ error: "Failed to fetch results" });
